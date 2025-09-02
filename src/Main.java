@@ -2,14 +2,28 @@
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        ConcurrentBank bank = new ConcurrentBank();
+        BankAccount account1 = bank.createAccount(1, 110);
+        BankAccount account2 = bank.createAccount(2, 0);
+        bank.getAccount(1).getBalance();
+        bank.getAccount(2).getBalance();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        Thread transferThread1 = new Thread(() -> bank.transfer(account1.getId(), account2.getId(), 100));
+        Thread transferThread2 = new Thread(() -> bank.transfer(account2.getId(), account1.getId(), 100));
+
+        transferThread1.start();
+        transferThread2.start();
+
+        try {
+            transferThread1.join();
+            transferThread2.join();
+        } catch (InterruptedException _) {
+
         }
+
+        // Вывод общего баланса
+        System.out.println("-----------------");
+        System.out.println("Total balance: " + bank.getTotalBalance());
+
     }
 }
